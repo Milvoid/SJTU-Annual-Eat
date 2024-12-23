@@ -27,6 +27,7 @@ def load_eat_data(eat_data, time_zone = 8):
     entities = data.get("entities", [])
     df = pd.DataFrame(entities)
 
+    # 取反并乘100取整，修复浮点精度问题
     df['amount'] = (df['amount'] * -100).round().astype(int)
     df['orderTime'] = df['orderTime'].apply(lambda x: convert_time(x, time_zone))
     df['payTime'] = df['payTime'].apply(lambda x: convert_time(x, time_zone))
