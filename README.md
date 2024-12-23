@@ -81,3 +81,5 @@ df['time_in_seconds'] = df['payTime'].dt.hour * 3600 + df['payTime'].dt.minute *
 `Get-Eat-Data.exe` 可直接运行；如果需要运行 `Get-Eat-Data.py`，请参考 [SJTU 开发者文档](https://developer.sjtu.edu.cn/auth/oauth.html) 填写 `client_id` 和 `client_secret`
 
 特别感谢来自 Boar 大佬的帮助
+
+以及感谢本仓库帮忙修代码的 Contributors
