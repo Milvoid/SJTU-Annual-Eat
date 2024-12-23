@@ -91,9 +91,9 @@ def get_eat_data(access_token, begin_date = BEGIN_DATE):
             
             if data.get('errno', 0) != 0:
                 print(data)
-                error_message = data.get('error', '未知错误')
+                # 防止泄露 client_id 和 client_secret，只放错误码
                 error_code = data.get('errno', '无错误码')
-                print(f"API 错误: {error_message} (错误码: {error_code})")
+                print(f"API 错误: {error_code})")
                 raise Exception()
             else:
                 print("消费数据获取成功")
