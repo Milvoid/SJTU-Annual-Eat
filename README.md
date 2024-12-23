@@ -6,11 +6,13 @@
 
 ## 快速开始
 
-前往 [Release 页面](https://github.com/Milvoid/SJTU-Annual-Eat/releases/tag/1.0.0) 下载 `Release.zip`
+> 同时支持 Windows 与 macOS（仅测试过 Apple Silicon 版本）
 
-解压后得到 `Get-Eat-Data.exe` 与 `Annual-Report.py` 
+前往 [Release 页面](https://github.com/Milvoid/SJTU-Annual-Eat/releases/tag/1.0.1) 下载 `Release.zip`
 
-首先运行  `Get-Eat-Data.exe` ，按照提示获取数据后得到 `eat-data.json`
+解压后得到 `Get-Eat-Data` 与 `Annual-Report.py` 
+
+首先运行  `Get-Eat-Data` ，按照提示获取数据后得到 `eat-data.json`
 
 之后再运行  `Annual-Report.py`  即可生成年度报告啦
 
@@ -45,6 +47,10 @@
 ```
 
 ![example](https://raw.githubusercontent.com/Milvoid/SJTU-Annual-Eat/main/example.png)
+
+## 常见问题
+
+`Annual-Report.py` 找不到 `eat-data.json`：此时可尝试打开命令行或终端，通过 `cd` 进入 `eat-data.json` 所在目录后再从终端运行 `Annual-Report.py`；或直接将 `Annual-Report.py` 中打开的文件目录修改为绝对路径
 
 ## Notes
 
