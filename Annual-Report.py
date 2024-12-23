@@ -29,6 +29,7 @@ def load_eat_data(eat_data, time_zone = 8):
 
     # 取反并乘100取整，修复浮点精度问题
     df['amount'] = (df['amount'] * -100).round().astype(int)
+    df['amount'] = df['amount'] / 100
     df['orderTime'] = df['orderTime'].apply(lambda x: convert_time(x, time_zone))
     df['payTime'] = df['payTime'].apply(lambda x: convert_time(x, time_zone))
 
@@ -95,7 +96,6 @@ def annual_analysis(df):
     print("  在交大的每一顿都要好好吃饭～")
 
     # 按日期分组，找到每一天中最早的时间
-    # 这部分代码似乎有兼容性问题
     try:
         earliest_rows_per_day = df.loc[df.groupby('date')['time'].idxmin()]
         overall_earliest_row = earliest_rows_per_day.loc[earliest_rows_per_day['time'].idxmin()]
@@ -105,22 +105,12 @@ def annual_analysis(df):
         print(f"\n  获取每日最早消费时出错，请更新pandas: pip install --upgrade pandas")
 
 
-    # 一天内消费次数分布
-    plt.figure(figsize=(10, 6))
-    plt.hist(df['hour'], bins=24, color='skyblue', edgecolor='black')
-    plt.title('消费时间分布')
-    plt.xlabel('时间')
-    plt.ylabel('消费次数')
-    plt.xticks(range(0, 24))
-    plt.show()
-
     # 月份消费金额分布
     df['month'] = df['payTime'].dt.month
     most_expensive_month = df.groupby('month')['amount'].sum().idxmax()
     most_expensive_month_total = df.groupby('month')['amount'].sum().max()
     print(f"\n  你在 {most_expensive_month} 月消费最多，一共花了 {most_expensive_month_total:.2f} 元。")
     print("  来看看你的月份分布图")
-
 
     # 按食堂分组，统计总消费金额
     grouped = df.groupby('merchant')['amount'].sum().sort_values(ascending=False)
@@ -136,7 +126,7 @@ def annual_analysis(df):
 
 
     # 绘图
-    fig, axs = plt.subplots(1, 2, figsize=(15, 6))
+    fig, axs = plt.subplots(1, 3, figsize=(20, 6))
 
     # 食堂消费金额饼图
     final_grouped.plot(
@@ -154,6 +144,13 @@ def annual_analysis(df):
     axs[1].set_ylabel('消费金额', fontsize=12)
     axs[1].set_xticks(range(1, 13))  # 确保横坐标是 1 到 12 月份
 
+    # 一天内消费时间分布
+    axs[2].hist(df['hour'], bins=24, color='skyblue', edgecolor='black')
+    axs[2].set_title('一天内消费时间分布', fontsize=16)
+    axs[2].set_xlabel('时间 (小时)', fontsize=12)
+    axs[2].set_ylabel('消费次数', fontsize=12)
+    axs[2].set_xticks(range(0, 24))  # 确保横坐标是 0 到 23 小时
+
     # 调整布局和显示
     plt.tight_layout()
     plt.show()
@@ -168,14 +165,14 @@ if __name__ == "__main__":
         with open("eat-data.json", 'r', encoding='utf-8') as eat_data:
             eat_data_df = load_eat_data(eat_data)
 
+        # 可以启用过滤
         # 加入更多过滤条件
         # eat_data_df = eat_data_df[eat_data_df.merchant != '充值']
-        eat_data_df = filter(eat_data_df)
-        eat_data_df['amount'] = eat_data_df['amount'] / 100
-
+        # eat_data_df = filter(eat_data_df)
         annual_analysis(eat_data_df)
     except FileNotFoundError:
         print("\n首次运行，请先运行 Get-Eat-Data 以获取消费数据")
+        print("如果已经运行过 Get-Eat-Data，请查看 README 中的问题解答")
         input("按回车键退出...")
     except Exception:
         print("\n发生其他错误")
