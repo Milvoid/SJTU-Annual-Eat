@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>思源码年度消费报告 2024</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- 引入Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script> <!-- 引入chartjs-plugin-datalabels -->
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8; /* 淡灰蓝背景色 */
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+        .container {
+            width: 80%;
+            max-width: 1000px;
+            background-color: rgba(255, 255, 255, 0.95); /* 半透明白色背景 */
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #3498db;
+        }
+        p {
+            line-height: 1.4; /* 普通段落的行间距较小 */
+            font-size: 1.2em;
+            color: #333;
+            margin: 10px 0;
+        }
+        p.double-spacing {
+            line-height: 1.8; /* 两行文字之间保持稍大的行间距 */
+        }
+        .footer {
+            text-align: center;
+            font-size: 1.1em;
+            color: #7f8c8d;
+            margin-top: 40px;
+        }
+        .footer .emoji {
+            font-size: 30px;
+        }
+        .month-charts {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+        }
+        .chart-container {
+            width: 45%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .header {
+            background-color: #f7f7f7; /* 更素淡的背景色 */
+            padding: 40px 0;
+            text-align: center;
+            border-radius: 15px;
+            color: #333;
+            font-size: 1.8em;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            思源码年度消费报告 2024
+        </div>
+
+        <div class="section">
+            <p>{{ total_spending_text }}</p>
+        </div>
+
+        <div class="section">
+            <p class="double-spacing">{{ first_spending_text }}</p>
+            <p>在交大的每一年都要有一个美好的开始。</p>
+        </div>
+
+        <div class="section">
+            <p class="double-spacing">{{ highest_single_spending_text }}</p>
+            <p>哇，真是胃口大开的一顿！</p>
+        </div>
+
+        <div class="section">
+            <p class="double-spacing">{{ favorite_place_spending_text }}</p>
+            <p>想来这里一定有你钟爱的菜品。</p>
+        </div>
+
+        <div class="section">
+            <p class="double-spacing">{{ meal_counts_text }}</p>
+            <p>在交大的每一顿都要好好吃饭～</p>
+        </div>
+
+        <div class="section">
+            <p class="double-spacing">{{ earliest_meal_text }}</p>
+        </div>
+
+        <div class="section">
+            <p class="double-spacing">{{ most_expensive_month_text }}</p>
+        </div>
+
+        <!-- 两个并排的饼状图 -->
+        <div class="month-charts">
+            <div class="chart-container">
+                <h2 style="text-align: center;">食堂消费分布</h2>
+                <canvas id="pieChart1"></canvas> <!-- 第一个饼状图 -->
+            </div>
+            <div class="chart-container">
+                <h2 style="text-align: center;">月份消费分布</h2>
+                <canvas id="pieChart2"></canvas> <!-- 第二个饼状图 -->
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>不管怎样，吃饭要紧</p>
+            <p>2025年也要记得好好吃饭喔 <span class="emoji">⌒▽⌒</span>☆</p>
+        </div>
+    </div>
+
+    <script>
+        // 饼状图1数据
+        const data1 = {
+            labels: {{ pie_label_1 }},
+            datasets: [{
+                label: '消费分布',
+                data: {{ pie_data_1 }},
+                backgroundColor: [
+                    '#A1C4D5', '#B7D3B2', '#F1E1A6', '#D6B8A8', '#E2C9C2', 
+                    '#A8D0B5', '#B8C7D1', '#E4D6C9', '#C1B8D9', '#D9E4B9'
+                ], // 低饱和度的温和颜色
+                borderColor: '#fff',
+                borderWidth: 1
+            }]
+        };
+
+        // 饼状图2数据
+        const data2 = {
+            labels: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+            datasets: [{
+                label: '消费分布',
+                data: {{ pie_data_2 }},
+                backgroundColor: [
+                    '#D6E6F2', '#D0F0C0', '#F4E1B2', '#E1C7D0', '#F0D9C5',
+                    '#A7D1B8', '#B1C7E2', '#D9D0D4', '#C9B8E0', '#D4E2C7'
+                ], // 另一组低饱和度颜色
+                borderColor: '#fff',
+                borderWidth: 1
+            }]
+        };
+
+        // 饼状图1配置
+        const config1 = {
+            type: 'pie',
+            data: data1,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return tooltipItem.label + ': ' + tooltipItem.raw + '元';
+                            }
+                        }
+                    },
+                    datalabels: {
+                        formatter: (value, ctx) => {
+                            return value + '元';  // 显示数值
+                        },
+                        color: '#fff', // 数字颜色
+                        font: {
+                            weight: 'bold',
+                            size: 14
+                        },
+                        anchor: 'end', // 数字位置
+                        align: 'start' // 数字位置
+                    }
+                }
+            }
+        };
+
+        // 饼状图2配置
+        const config2 = {
+            type: 'pie',
+            data: data2,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return tooltipItem.label + ': ' + tooltipItem.raw + '元';
+                            }
+                        }
+                    },
+                    datalabels: {
+                        formatter: (value, ctx) => {
+                            return value + '元';  // 显示数值
+                        },
+                        color: '#fff', // 数字颜色
+                        font: {
+                            weight: 'bold',
+                            size: 14
+                        },
+                        anchor: 'end', // 数字位置
+                        align: 'start' // 数字位置
+                    }
+                }
+            }
+        };
+
+        // 渲染饼状图1
+        const ctx1 = document.getElementById('pieChart1').getContext('2d');
+        new Chart(ctx1, config1);
+
+        // 渲染饼状图2
+        const ctx2 = document.getElementById('pieChart2').getContext('2d');
+        new Chart(ctx2, config2);
+    </script>
+
+</body>
+</html>

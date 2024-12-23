@@ -76,6 +76,15 @@ df['time_in_seconds'] = df['payTime'].dt.hour * 3600 + df['payTime'].dt.minute *
 
 ![example](https://raw.githubusercontent.com/Milvoid/SJTU-Annual-Eat/main/example.png)
 
+## 海报生成
+
+你也可以通过运行下面的脚本来生成一幅简单的海报，你可以用你的浏览器打开```海报.html```和截图。
+```
+python generate-poster.py
+```
+
+![](./example-poster.png)
+
 ## Notes
 
 `Get-Eat-Data.exe` 可直接运行；如果需要运行 `Get-Eat-Data.py`，请参考 [SJTU 开发者文档](https://developer.sjtu.edu.cn/auth/oauth.html) 填写 `client_id` 和 `client_secret`
