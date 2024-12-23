@@ -5,7 +5,7 @@ import matplotlib.cm as cm
 import json
 
 # 指定字体
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Hiragino Sans GB', 'Noto Sans SC']
+plt.rcParams['font.sans-serif'] = ['MiSans', 'SimHei', 'Hiragino Sans GB', 'Noto Sans SC', 'Noto Sans']
 
 def convert_time(timestamp, time_zone = 8):
     '''
