@@ -153,7 +153,13 @@ def annual_analysis(df):
 
     # 调整布局和显示
     plt.tight_layout()
-    plt.show()
+    try:
+        plt.show()
+    except Exception:
+        print("\n  无法显示图表，输入图片名称以保存图表（可选）")
+        filename = input("  图片名称（不需要后缀）：")
+        if filename:
+            plt.savefig(f"{filename}.png")
 
     print("\n不管怎样，吃饭要紧")
     input("2025年也要记得好好吃饭喔(⌒▽⌒)☆ \n")
