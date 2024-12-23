@@ -74,7 +74,7 @@ df['time_in_seconds'] = df['payTime'].dt.hour * 3600 + df['payTime'].dt.minute *
 2025年也要记得好好吃饭喔(⌒▽⌒)☆ 
 ```
 
-![example](https://raw.githubusercontent.com/Milvoid/SJTU-Annual-Eat/main/example.png)
+![example](https://raw.githubusercontent.com/Milvoid/SJTU-Annual-Eat/main/figs/example.png)
 
 ## 海报生成
 
