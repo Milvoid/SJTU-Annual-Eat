@@ -114,7 +114,7 @@ def annual_analysis(df):
     plt.xticks(range(0, 24))
     plt.show()
 
-    月份消费金额分布
+    # 月份消费金额分布
     df['month'] = df['payTime'].dt.month
     most_expensive_month = df.groupby('month')['amount'].sum().idxmax()
     most_expensive_month_total = df.groupby('month')['amount'].sum().max()
