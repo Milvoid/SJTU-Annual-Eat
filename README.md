@@ -16,6 +16,34 @@
 
 之后再运行  `Annual-Report.py`  即可生成年度报告啦
 
+## 常见问题及解决
+
+- Annual-Report.py 闪了一下就没了
+
+可能是所需的库没有安装，可以用文本编辑器打开文件，之后查看最上方需要导入的模块是否有缺失
+
+- Access Token 获取失败
+
+可以确认一下自己没有使用代理，sjtu服务器好像会somehow因为代理拒绝访问
+
+- 运行到早中晚餐之后报错
+
+应该是统计最早一餐部分的兼容性问题，可以手动注释掉该部分，或者下载新的 Release 这部分失败之后自动跳过
+
+代码有点bug，按日期分组,找到每一天中最早的时间那边会错误，不知道是不是 pandas 版本问题
+
+如果是 `reduction operation 'argmin' not allowed for this dtype` 问题，可以在函数load_eat_data的最后加一行
+
+```python
+df['time_in_seconds'] = df['payTime'].dt.hour * 3600 + df['payTime'].dt.minute * 60 + df['payTime'].dt.second
+```
+
+然后把“按日期分组，找到每一天中最早的时间”下面两行中的'time'都改成'time_in_seconds'就行了。
+
+- 运行 Get-Eat-Data 后仍然找不到 json 文件
+
+可以在终端里先 cd 到 json 文件所在路径，之后从终端运行 Annual-Report.py；或者直接把 Annual-Report.py 的文件路径改成绝对路径
+
 ## 示例
 
 运行 `Annual-Report.py` 之后，你就可以看到今年的一些 Highlight 以及相关统计图，譬如：
@@ -47,10 +75,6 @@
 ```
 
 ![example](https://raw.githubusercontent.com/Milvoid/SJTU-Annual-Eat/main/example.png)
-
-## 常见问题
-
-`Annual-Report.py` 找不到 `eat-data.json`：此时可尝试打开命令行或终端，通过 `cd` 进入 `eat-data.json` 所在目录后再从终端运行 `Annual-Report.py`；或直接将 `Annual-Report.py` 中打开的文件目录修改为绝对路径
 
 ## Notes
 
