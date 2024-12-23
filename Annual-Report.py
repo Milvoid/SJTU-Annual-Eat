@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import json
 
 # 指定字体
-plt.rcParams['font.sans-serif'] = ['Hiragino Sans GB', 'SimHei'] 
+plt.rcParams['font.sans-serif'] = ['Hiragino Sans GB', 'SimHei']
 
 def convert_time(timestamp, time_zone = 8):
     '''
@@ -13,7 +13,7 @@ def convert_time(timestamp, time_zone = 8):
     # 转换为 UTC 时间
     utc_time = dt.datetime.fromtimestamp(timestamp, tz = dt.timezone.utc)
     # 转换为东八区时间
-    converted_time = utc_time.astimezone(dt.timezone(dt.timedelta(hours = time_zone))) 
+    converted_time = utc_time.astimezone(dt.timezone(dt.timedelta(hours = time_zone)))
     return converted_time
 
 
@@ -26,7 +26,7 @@ def load_eat_data(eat_data, time_zone = 8):
     entities = data.get("entities", [])
     df = pd.DataFrame(entities)
 
-    df['amount'] = df['amount'] * -1
+    df['amount'] = (df['amount'] * -100).round().astype(int)
     df['orderTime'] = df['orderTime'].apply(lambda x: convert_time(x, time_zone))
     df['payTime'] = df['payTime'].apply(lambda x: convert_time(x, time_zone))
 
@@ -50,30 +50,30 @@ def annual_analysis(df):
     print("\n思源码年度消费报告：")
 
     # 总消费
-    total_value = df['amount'].sum()
+    total_value = df['amount'].sum() / 100
     print(f"\n  2024年，你在交大共消费了 {total_value} 元。")
 
     # 第一笔消费
     first_row = df.iloc[-1]
-    print(f"\n  {first_row['formatted_payTime']}，你在 {first_row['merchant']} 开启了第一笔在交大的消费，花了 {first_row['amount']} 元。")
+    print(f"\n  {first_row['formatted_payTime']}，你在 {first_row['merchant']} 开启了第一笔在交大的消费，花了 {first_row['amount'] / 100} 元。")
     print("  在交大的每一年都要有一个美好的开始。")
 
     # 最大消费
     max_row = df.loc[df['amount'].idxmax()]
-    print(f"\n  今年 {max_row['formatted_payTime']}，你在交大的 {max_row['merchant']} 单笔最多消费了 {max_row['amount']} 元。")
-    print("  哇，真是胃口大开的一顿！") 
+    print(f"\n  今年 {max_row['formatted_payTime']}，你在交大的 {max_row['merchant']} 单笔最多消费了 {max_row['amount'] / 100} 元。")
+    print("  哇，真是胃口大开的一顿！")
 
     # 最常消费
     most_frequent_merchant = df['merchant'].mode()[0]
     most_frequent_merchant_count = df[df['merchant'] == most_frequent_merchant].shape[0]
-    most_frequent_merchant_total = df[df['merchant'] == most_frequent_merchant]['amount'].sum()
+    most_frequent_merchant_total = df[df['merchant'] == most_frequent_merchant]['amount'].sum() / 100
     print(f"\n  你最常前往 {most_frequent_merchant} ，一共 {most_frequent_merchant_count} 次，总共花了 {most_frequent_merchant_total} 元。")
     print("  这里的美食真是让你回味无穷。")
 
     # 最多消费
     most_expensive_merchant = df.groupby('merchant')['amount'].sum().idxmax()
     most_expensive_merchant_count = df[df['merchant'] == most_expensive_merchant].shape[0]
-    most_expensive_merchant_total = df.groupby('merchant')['amount'].sum().max()
+    most_expensive_merchant_total = df.groupby('merchant')['amount'].sum().max() / 100
     print(f"\n  你在 {most_expensive_merchant} 消费最多，{most_expensive_merchant_count} 次消费里，一共花了 {most_expensive_merchant_total} 元。")
     print("  想来这里一定有你钟爱的菜品。")
 
@@ -88,7 +88,7 @@ def annual_analysis(df):
     # 按日期分组，找到每一天中最早的时间
     earliest_rows_per_day = df.loc[df.groupby('date')['time'].idxmin()]
     overall_earliest_row = earliest_rows_per_day.loc[earliest_rows_per_day['time'].idxmin()]
-    print(f"\n  {overall_earliest_row['formatted_payTime']} 是你今年最早的一次用餐，你一早就在 {overall_earliest_row['merchant']} 吃了 {overall_earliest_row['amount']} 元。")
+    print(f"\n  {overall_earliest_row['formatted_payTime']} 是你今年最早的一次用餐，你一早就在 {overall_earliest_row['merchant']} 吃了 {overall_earliest_row['amount'] / 100} 元。")
 
     # # 一天内消费次数分布
     # plt.figure(figsize=(10, 6))
@@ -103,7 +103,7 @@ def annual_analysis(df):
     df['month'] = df['payTime'].dt.month
     most_expensive_month = df.groupby('month')['amount'].sum().idxmax()
     most_expensive_month_total = df.groupby('month')['amount'].sum().max()
-    print(f"\n  你在 {most_expensive_month} 月消费最多，一共花了 {most_expensive_month_total} 元。")
+    print(f"\n  你在 {most_expensive_month} 月消费最多，一共花了 {most_expensive_month_total / 100} 元。")
     print("  来看看你的月份分布图")
 
 
@@ -118,7 +118,7 @@ def annual_analysis(df):
     other_sum = grouped[grouped / total_amount < threshold].sum()
     # 合并为新的 Series
     final_grouped = pd.concat([major_merchants, pd.Series({'其他': other_sum})])
-    
+
 
     # 绘图
     fig, axs = plt.subplots(1, 2, figsize=(15, 6))
