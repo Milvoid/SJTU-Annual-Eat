@@ -109,7 +109,7 @@ def get_eat_data(access_token, begin_date = BEGIN_DATE):
             print(f"\n请求失败，状态码: {response.status_code}")
             print(f"错误信息: {response.text}")
     except Exception as e:
-        print(f"\n请求过程中发生错误，请检查网络或删除目录下的 eat-data.json 文件后重试")
+        print(f"\n请求过程中发生错误，请检查网络及代理设置，或删除目录下的 eat-data.json 文件后重试")
 
 
 if __name__ == "__main__":
