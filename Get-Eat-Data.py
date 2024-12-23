@@ -89,7 +89,8 @@ def get_eat_data(access_token, begin_date = BEGIN_DATE):
             # 解析响应 JSON 数据
             data = response.json()
             
-            if 'error' in data:
+            if data.get('errno', 0) != 0:
+                print(data)
                 error_message = data.get('error', '未知错误')
                 error_code = data.get('errno', '无错误码')
                 print(f"API 错误: {error_message} (错误码: {error_code})")
