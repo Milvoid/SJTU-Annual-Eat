@@ -55,7 +55,7 @@ def get_access_token(authorization_code):
     }
 
     # 发起 POST 请求到 TOKEN_URL
-    response = requests.post(TOKEN_URL, headers=headers, auth=auth, data=data)
+    response = post(TOKEN_URL, headers=headers, auth=auth, data=data)
 
     # 检查返回结果
     if response.status_code == 200:
@@ -82,19 +82,27 @@ def get_eat_data(access_token, begin_date = BEGIN_DATE):
 
     # 发起请求
     try:
-        response = requests.get(API_URL, params=params)
+        response = get(API_URL, params=params)
         
         # 检查请求是否成功
         if response.status_code == 200:
             # 解析响应 JSON 数据
             data = response.json()
-            print("消费数据获取成功")
             
-            # 保存到文件
-            with open("eat-data.json", "w", encoding="utf-8") as file:
-                json.dump(data, file, ensure_ascii=False, indent=4)
-            
-            print("\n消费数据已保存")
+            if data.get('errno', 0) != 0:
+                print(data)
+                error_message = data.get('error', '未知错误')
+                error_code = data.get('errno', '无错误码')
+                print(f"API 错误: {error_message} (错误码: {error_code})")
+                raise Exception()
+            else:
+                print("消费数据获取成功")
+                
+                # 保存到文件
+                with open("eat-data.json", "w", encoding="utf-8") as file:
+                    json.dump(data, file, ensure_ascii=False, indent=4)
+                
+                print("\n消费数据已保存")
             
             return data
         else:
@@ -122,8 +130,8 @@ if __name__ == "__main__":
             print(f"{access_token}\n")
 
         # 获取消费数据
-        get_eat_data(access_token)
-        input("请前往 Annual-Report.py 以继续...")
+        if get_eat_data(access_token):
+            input("请前往 Annual-Report.py 以继续...")
 
     except Exception:
         print("Unknown Error：500")
