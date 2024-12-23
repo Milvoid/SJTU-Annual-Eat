@@ -126,5 +126,5 @@ if __name__ == "__main__":
         input("请前往 Annual-Report.py 以继续...")
 
     except Exception:
-        print("发生其他错误，请删除目录下的 eat-data.json 文件后重试")
-        exit()
+        print("Unknown Error：500")
+        input("按回车键退出...")
