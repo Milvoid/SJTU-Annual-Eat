@@ -42,7 +42,14 @@ def load_eat_data(eat_data, time_zone = 8):
 
     return df
 
-
+def filter(df):
+    '''
+    过滤一些非餐饮消费数据
+    '''
+    filter_keys = ['电瓶车', '游泳', '充值', '核减'] # 需要继续补充
+    for k in filter_keys:
+        df = df[~df['merchant'].str.contains(k)]
+    return df
 
 def annual_analysis(df):
     '''
@@ -52,31 +59,31 @@ def annual_analysis(df):
     print("\n思源码年度消费报告：")
 
     # 总消费
-    total_value = df['amount'].sum() / 100
-    print(f"\n  2024年，你在交大共消费了 {total_value} 元。")
+    total_value = df['amount'].sum()
+    print(f"\n  2024年，你在交大共消费了 {total_value:.2f} 元。")
 
     # 第一笔消费
     first_row = df.iloc[-1]
-    print(f"\n  {first_row['formatted_payTime']}，你在 {first_row['merchant']} 开启了第一笔在交大的消费，花了 {first_row['amount'] / 100} 元。")
+    print(f"\n  {first_row['formatted_payTime']}，你在 {first_row['merchant']} 开启了第一笔在交大的消费，花了 {first_row['amount']:.2f} 元。")
     print("  在交大的每一年都要有一个美好的开始。")
 
     # 最大消费
     max_row = df.loc[df['amount'].idxmax()]
-    print(f"\n  今年 {max_row['formatted_payTime']}，你在交大的 {max_row['merchant']} 单笔最多消费了 {max_row['amount'] / 100} 元。")
+    print(f"\n  今年 {max_row['formatted_payTime']}，你在交大的 {max_row['merchant']} 单笔最多消费了 {max_row['amount']:.2f} 元。")
     print("  哇，真是胃口大开的一顿！")
 
     # 最常消费
     most_frequent_merchant = df['merchant'].mode()[0]
     most_frequent_merchant_count = df[df['merchant'] == most_frequent_merchant].shape[0]
-    most_frequent_merchant_total = df[df['merchant'] == most_frequent_merchant]['amount'].sum() / 100
-    print(f"\n  你最常前往 {most_frequent_merchant} ，一共 {most_frequent_merchant_count} 次，总共花了 {most_frequent_merchant_total} 元。")
+    most_frequent_merchant_total = df[df['merchant'] == most_frequent_merchant]['amount'].sum()
+    print(f"\n  你最常前往 {most_frequent_merchant} ，一共 {most_frequent_merchant_count} 次，总共花了 {most_frequent_merchant_total:.2f} 元。")
     print("  这里的美食真是让你回味无穷。")
 
     # 最多消费
     most_expensive_merchant = df.groupby('merchant')['amount'].sum().idxmax()
     most_expensive_merchant_count = df[df['merchant'] == most_expensive_merchant].shape[0]
-    most_expensive_merchant_total = df.groupby('merchant')['amount'].sum().max() / 100
-    print(f"\n  你在 {most_expensive_merchant} 消费最多，{most_expensive_merchant_count} 次消费里，一共花了 {most_expensive_merchant_total} 元。")
+    most_expensive_merchant_total = df.groupby('merchant')['amount'].sum().max()
+    print(f"\n  你在 {most_expensive_merchant} 消费最多，{most_expensive_merchant_count} 次消费里，一共花了 {most_expensive_merchant_total:.2f} 元。")
     print("  想来这里一定有你钟爱的菜品。")
 
     # 早中晚消费
@@ -92,9 +99,10 @@ def annual_analysis(df):
     try:
         earliest_rows_per_day = df.loc[df.groupby('date')['time'].idxmin()]
         overall_earliest_row = earliest_rows_per_day.loc[earliest_rows_per_day['time'].idxmin()]
-        print(f"\n  {overall_earliest_row['formatted_payTime']} 是你今年最早的一次用餐，你一早就在 {overall_earliest_row['merchant']} 吃了 {overall_earliest_row['amount'] / 100} 元。")
-    except Exception as e:
-        print("\n  获取每日最早消费时出错：{e}")
+        print(f"\n  {overall_earliest_row['formatted_payTime']} 是你今年最早的一次用餐，你一早就在 {overall_earliest_row['merchant']} 吃了 {overall_earliest_row['amount']:.2f} 元。")
+    # 错误似乎是因为pandas版本过低导致的，建议更新
+    except Exception:
+        print(f"\n  获取每日最早消费时出错，请更新pandas: pip install --upgrade pandas")
 
 
     # # 一天内消费次数分布
@@ -110,7 +118,7 @@ def annual_analysis(df):
     df['month'] = df['payTime'].dt.month
     most_expensive_month = df.groupby('month')['amount'].sum().idxmax()
     most_expensive_month_total = df.groupby('month')['amount'].sum().max()
-    print(f"\n  你在 {most_expensive_month} 月消费最多，一共花了 {most_expensive_month_total / 100} 元。")
+    print(f"\n  你在 {most_expensive_month} 月消费最多，一共花了 {most_expensive_month_total:.2f} 元。")
     print("  来看看你的月份分布图")
 
 
@@ -159,7 +167,12 @@ if __name__ == "__main__":
     try:
         with open("eat-data.json", 'r', encoding='utf-8') as eat_data:
             eat_data_df = load_eat_data(eat_data)
-        eat_data_df = eat_data_df[eat_data_df.merchant != '充值']
+
+        # 加入更多过滤条件
+        # eat_data_df = eat_data_df[eat_data_df.merchant != '充值']
+        eat_data_df = filter(eat_data_df)
+        eat_data_df['amount'] = eat_data_df['amount'] / 100
+
         annual_analysis(eat_data_df)
     except FileNotFoundError:
         print("\n首次运行，请先运行 Get-Eat-Data 以获取消费数据")

@@ -5,3 +5,5 @@ eat-data.json
 /.idea
 /.vscode
 **/.DS_Store
+
+*.json
