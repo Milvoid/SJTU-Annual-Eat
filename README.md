@@ -83,7 +83,7 @@ df['time_in_seconds'] = df['payTime'].dt.hour * 3600 + df['payTime'].dt.minute *
 python generate-poster.py
 ```
 
-![](./example-poster.png)
+![](./figs/example-poster.png)
 
 ## Notes
 
