@@ -105,58 +105,58 @@ def annual_analysis(df):
         print(f"\n  获取每日最早消费时出错，请更新pandas: pip install --upgrade pandas")
 
 
-    # # 一天内消费次数分布
-    # plt.figure(figsize=(10, 6))
-    # plt.hist(df['hour'], bins=24, color='skyblue', edgecolor='black')
-    # plt.title('消费时间分布')
-    # plt.xlabel('时间')
-    # plt.ylabel('消费次数')
-    # plt.xticks(range(0, 24))
-    # plt.show()
+    # 一天内消费次数分布
+    plt.figure(figsize=(10, 6))
+    plt.hist(df['hour'], bins=24, color='skyblue', edgecolor='black')
+    plt.title('消费时间分布')
+    plt.xlabel('时间')
+    plt.ylabel('消费次数')
+    plt.xticks(range(0, 24))
+    plt.show()
+
+    月份消费金额分布
+    df['month'] = df['payTime'].dt.month
+    most_expensive_month = df.groupby('month')['amount'].sum().idxmax()
+    most_expensive_month_total = df.groupby('month')['amount'].sum().max()
+    print(f"\n  你在 {most_expensive_month} 月消费最多，一共花了 {most_expensive_month_total:.2f} 元。")
+    print("  来看看你的月份分布图")
+
+
+    # 按食堂分组，统计总消费金额
+    grouped = df.groupby('merchant')['amount'].sum().sort_values(ascending=False)
+    # 计算总消费金额
+    total_amount = grouped.sum()
+    # 找到占比 >= 1% 的食堂
+    threshold = 0.01  # 占比 1%
+    major_merchants = grouped[grouped / total_amount >= threshold]
+    # 将占比 < 1% 的合并为 "其他"
+    other_sum = grouped[grouped / total_amount < threshold].sum()
+    # 合并为新的 Series
+    final_grouped = pd.concat([major_merchants, pd.Series({'其他': other_sum})])
+
+
+    # 绘图
+    fig, axs = plt.subplots(1, 2, figsize=(15, 6))
+
+    # 食堂消费金额饼图
+    final_grouped.plot(
+        kind='pie', autopct='%1.1f%%', startangle=90, textprops={'fontsize': 12}, ax=axs[0]
+    )
+    axs[0].set_ylabel('')  # 去掉 y 轴标签
+    axs[0].set_title('各食堂总消费金额分布', fontsize=16)
 
     # 月份消费金额分布
-    # df['month'] = df['payTime'].dt.month
-    # most_expensive_month = df.groupby('month')['amount'].sum().idxmax()
-    # most_expensive_month_total = df.groupby('month')['amount'].sum().max()
-    # print(f"\n  你在 {most_expensive_month} 月消费最多，一共花了 {most_expensive_month_total:.2f} 元。")
-    # print("  来看看你的月份分布图")
+    df['month'] = df['payTime'].dt.month
+    monthly_amount = df.groupby('month')['amount'].sum()
+    axs[1].bar(monthly_amount.index, monthly_amount.values, color='skyblue')
+    axs[1].set_title('月份消费金额分布', fontsize=16)
+    axs[1].set_xlabel('月份', fontsize=12)
+    axs[1].set_ylabel('消费金额', fontsize=12)
+    axs[1].set_xticks(range(1, 13))  # 确保横坐标是 1 到 12 月份
 
-
-    # # 按食堂分组，统计总消费金额
-    # grouped = df.groupby('merchant')['amount'].sum().sort_values(ascending=False)
-    # # 计算总消费金额
-    # total_amount = grouped.sum()
-    # # 找到占比 >= 1% 的食堂
-    # threshold = 0.01  # 占比 1%
-    # major_merchants = grouped[grouped / total_amount >= threshold]
-    # # 将占比 < 1% 的合并为 "其他"
-    # other_sum = grouped[grouped / total_amount < threshold].sum()
-    # # 合并为新的 Series
-    # final_grouped = pd.concat([major_merchants, pd.Series({'其他': other_sum})])
-
-
-    # # 绘图
-    # fig, axs = plt.subplots(1, 2, figsize=(15, 6))
-
-    # # 食堂消费金额饼图
-    # final_grouped.plot(
-    #     kind='pie', autopct='%1.1f%%', startangle=90, textprops={'fontsize': 12}, ax=axs[0]
-    # )
-    # axs[0].set_ylabel('')  # 去掉 y 轴标签
-    # axs[0].set_title('各食堂总消费金额分布', fontsize=16)
-
-    # # 月份消费金额分布
-    # df['month'] = df['payTime'].dt.month
-    # monthly_amount = df.groupby('month')['amount'].sum()
-    # axs[1].bar(monthly_amount.index, monthly_amount.values, color='skyblue')
-    # axs[1].set_title('月份消费金额分布', fontsize=16)
-    # axs[1].set_xlabel('月份', fontsize=12)
-    # axs[1].set_ylabel('消费金额', fontsize=12)
-    # axs[1].set_xticks(range(1, 13))  # 确保横坐标是 1 到 12 月份
-
-    # # 调整布局和显示
-    # plt.tight_layout()
-    # plt.show()
+    # 调整布局和显示
+    plt.tight_layout()
+    plt.show()
 
     print("\n不管怎样，吃饭要紧")
     input("2025年也要记得好好吃饭喔(⌒▽⌒)☆ \n")
