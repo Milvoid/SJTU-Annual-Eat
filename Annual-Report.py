@@ -1,10 +1,11 @@
 import pandas as pd
 import datetime as dt
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 import json
 
 # 指定字体
-plt.rcParams['font.sans-serif'] = ['Hiragino Sans GB', 'SimHei']
+plt.rcParams['font.sans-serif'] = ['SimHei', 'Hiragino Sans GB', 'Noto Sans SC']
 
 def convert_time(timestamp, time_zone = 8):
     '''
@@ -86,9 +87,14 @@ def annual_analysis(df):
     print("  在交大的每一顿都要好好吃饭～")
 
     # 按日期分组，找到每一天中最早的时间
-    earliest_rows_per_day = df.loc[df.groupby('date')['time'].idxmin()]
-    overall_earliest_row = earliest_rows_per_day.loc[earliest_rows_per_day['time'].idxmin()]
-    print(f"\n  {overall_earliest_row['formatted_payTime']} 是你今年最早的一次用餐，你一早就在 {overall_earliest_row['merchant']} 吃了 {overall_earliest_row['amount'] / 100} 元。")
+    # 这部分代码似乎有兼容性问题
+    try:
+        earliest_rows_per_day = df.loc[df.groupby('date')['time'].idxmin()]
+        overall_earliest_row = earliest_rows_per_day.loc[earliest_rows_per_day['time'].idxmin()]
+        print(f"\n  {overall_earliest_row['formatted_payTime']} 是你今年最早的一次用餐，你一早就在 {overall_earliest_row['merchant']} 吃了 {overall_earliest_row['amount'] / 100} 元。")
+    except Exception as e:
+        print("\n  获取每日最早消费时出错：{e}")
+
 
     # # 一天内消费次数分布
     # plt.figure(figsize=(10, 6))
@@ -122,13 +128,15 @@ def annual_analysis(df):
 
     # 绘图
     fig, axs = plt.subplots(1, 2, figsize=(15, 6))
+
+    # 食堂消费金额饼图
     final_grouped.plot(
         kind='pie', autopct='%1.1f%%', startangle=90, textprops={'fontsize': 12}, ax=axs[0]
     )
-
     axs[0].set_ylabel('')  # 去掉 y 轴标签
     axs[0].set_title('各食堂总消费金额分布', fontsize=16)
 
+    # 月份消费金额分布
     df['month'] = df['payTime'].dt.month
     monthly_amount = df.groupby('month')['amount'].sum()
     axs[1].bar(monthly_amount.index, monthly_amount.values, color='skyblue')
@@ -140,7 +148,6 @@ def annual_analysis(df):
     # 调整布局和显示
     plt.tight_layout()
     plt.show()
-
 
     print("\n不管怎样，吃饭要紧")
     input("2025年也要记得好好吃饭喔(⌒▽⌒)☆ \n")
