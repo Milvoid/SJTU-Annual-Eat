@@ -165,10 +165,8 @@ if __name__ == "__main__":
         with open("eat-data.json", 'r', encoding='utf-8') as eat_data:
             eat_data_df = load_eat_data(eat_data)
 
-        # 可以启用过滤
-        # 加入更多过滤条件
-        # eat_data_df = eat_data_df[eat_data_df.merchant != '充值']
-        # eat_data_df = filter(eat_data_df)
+        # 现在默认启用过滤
+        eat_data_df = filter(eat_data_df)
         annual_analysis(eat_data_df)
     except FileNotFoundError:
         print("\n首次运行，请先运行 Get-Eat-Data 以获取消费数据")
