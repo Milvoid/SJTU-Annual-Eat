@@ -5,7 +5,7 @@ import matplotlib.cm as cm
 import json
 
 # 指定字体
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Hiragino Sans GB', 'Noto Sans SC']
+plt.rcParams['font.sans-serif'] = ['MiSans', 'SimHei', 'Hiragino Sans GB', 'Noto Sans SC', 'Noto Sans']
 
 def convert_time(timestamp, time_zone = 8):
     '''
@@ -158,6 +158,7 @@ if __name__ == "__main__":
     try:
         with open("eat-data.json", 'r', encoding='utf-8') as eat_data:
             eat_data_df = load_eat_data(eat_data)
+        eat_data_df = eat_data_df[eat_data_df.merchant != '充值']
         annual_analysis(eat_data_df)
     except FileNotFoundError:
         print("\n首次运行，请先运行 Get-Eat-Data 以获取消费数据")
