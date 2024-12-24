@@ -46,9 +46,13 @@ def load_eat_data(eat_data, time_zone = 8):
 
 def filter(df):
     '''
-    过滤一些非餐饮消费数据
+    过滤数据
     '''
-    filter_keys = ['电瓶车', '游泳', '核减', '浴室', '教材科' ,'校医院', '充值'] # 需要继续补充
+    # 非消费（支出）数据
+    df = df[~(df['amount'] < 0)]
+
+    # 非餐饮数据
+    filter_keys = ['电瓶车', '游泳', '核减', '浴室', '教材科' ,'校医院', '充值', r'沪(?:\w){6,7}'] # 需要继续补充
     for k in filter_keys:
         df = df[~df['merchant'].str.contains(k)]
     return df
