@@ -4,7 +4,7 @@
 
 来看看你今年都在交大消费了些什么吧
 
-## 快速开始
+## Quick Start
 
 > 同时支持 Windows 与 macOS
 
@@ -16,7 +16,7 @@
 
 之后再运行  `Annual-Report.py`  即可生成年度报告啦
 
-## 常见问题及解决
+## Common Issues
 
 - Annual-Report.py 闪了一下就没了
 
@@ -44,7 +44,7 @@ df['time_in_seconds'] = df['payTime'].dt.hour * 3600 + df['payTime'].dt.minute *
 
 可以在终端里先 cd 到 json 文件所在路径，之后从终端运行 Annual-Report.py；或者直接把 Annual-Report.py 的文件路径改成绝对路径
 
-## 示例
+## Example
 
 运行 `Annual-Report.py` 之后，你就可以看到今年的一些 Highlight 以及相关统计图，譬如：
 
@@ -76,7 +76,7 @@ df['time_in_seconds'] = df['payTime'].dt.hour * 3600 + df['payTime'].dt.minute *
 
 ![example](https://raw.githubusercontent.com/Milvoid/SJTU-Annual-Eat/main/figs/example.png)
 
-## 海报生成
+## Poster
 
 你也可以通过运行下面的脚本来生成一幅简单的海报，你可以用你的浏览器打开```海报.html```和截图。
 ```
