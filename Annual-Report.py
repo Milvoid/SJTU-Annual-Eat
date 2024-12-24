@@ -2,6 +2,7 @@ import pandas as pd
 import datetime as dt
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+import warnings
 import json
 
 # 指定字体
@@ -45,9 +46,13 @@ def load_eat_data(eat_data, time_zone = 8):
 
 def filter(df):
     '''
-    过滤一些非餐饮消费数据
+    过滤数据
     '''
-    filter_keys = ['电瓶车', '游泳', '核减', '浴室', '教材科' ,'校医院', '充值'] # 需要继续补充
+    # 非消费（支出）数据
+    df = df[~(df['amount'] < 0)]
+
+    # 非餐饮数据
+    filter_keys = ['电瓶车', '游泳', '核减', '浴室', '教材科' ,'校医院', '充值', r'沪(?:\w){6,7}'] # 需要继续补充
     for k in filter_keys:
         df = df[~df['merchant'].str.contains(k)]
     return df
@@ -151,18 +156,23 @@ def annual_analysis(df):
     axs[2].set_ylabel('消费次数', fontsize=12)
     axs[2].set_xticks(range(0, 24))  # 确保横坐标是 0 到 23 小时
 
+    print("\n不管怎样，吃饭要紧")
+    print("2025年也要记得好好吃饭喔(⌒▽⌒)☆ \n")
+
     # 调整布局和显示
     plt.tight_layout()
-    try:
+    with warnings.catch_warnings(record=True) as warns:
+        warnings.simplefilter("always", UserWarning)
         plt.show()
-    except Exception:
-        print("\n  无法显示图表，输入图片名称以保存图表（可选）")
-        filename = input("  图片名称（不需要后缀）：")
+        if not any(item.category == UserWarning for item in warns):
+            print("未知`plt.show()`错误。请更新matplotlib: pip install --upgrade matplotlib")
+            raise
+        print("对不起，当前无法显示图表。你可以输入图片名称保存图表，也可以回车并不保存图片。")
+        filename = input("图片名称（不需要后缀）：")
         if filename:
             plt.savefig(f"{filename}.png")
 
-    print("\n不管怎样，吃饭要紧")
-    input("2025年也要记得好好吃饭喔(⌒▽⌒)☆ \n")
+    input()
 
 
 
@@ -180,4 +190,4 @@ if __name__ == "__main__":
         input("按回车键退出...")
     except Exception:
         print("\n发生其他错误")
-        input("按回车键退出...")
+        raise
