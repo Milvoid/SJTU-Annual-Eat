@@ -186,4 +186,4 @@ if __name__ == "__main__":
         input("按回车键退出...")
     except Exception:
         print("\n发生其他错误")
-        input("按回车键退出...")
+        raise
