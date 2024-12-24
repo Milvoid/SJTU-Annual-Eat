@@ -92,3 +92,9 @@ python generate-poster.py
 特别感谢来自 Boar 大佬的帮助
 
 以及感谢本仓库帮忙修代码的 Contributors
+
+## Related Links
+
+https://github.com/wzh656/SJTU-Annual-Report
+
+网页版本的年度报告，适合直接运行
