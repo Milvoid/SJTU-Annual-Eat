@@ -6,7 +6,7 @@
 
 ## 快速开始
 
-> 同时支持 Windows 与 macOS（仅测试过 Apple Silicon 版本）
+> 同时支持 Windows 与 macOS
 
 前往 [Release 页面](https://github.com/Milvoid/SJTU-Annual-Eat/releases/tag/1.0.1) 下载 `Release.zip`
 
