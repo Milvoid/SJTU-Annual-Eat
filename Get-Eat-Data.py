@@ -12,8 +12,8 @@ STATE = ""
 BEGIN_DATE = 1704038400
 
 # 设置 client_id 和 client_secret
-CLIENT_ID = ""  
-CLIENT_SECRET = ""  
+CLIENT_ID = "KfiGI09p9N4cPSHn5V7p"  
+CLIENT_SECRET = "64626D9129612AB319752F3298AD94FD97E9B9F7F8F7EAB9"
 
 def get_authorization_code():
     """
@@ -82,6 +82,7 @@ def get_eat_data(access_token, begin_date = BEGIN_DATE):
 
     # 发起请求
     try:
+        print(f"Using params: {params}")
         response = get(API_URL, params=params)
         
         # 检查请求是否成功

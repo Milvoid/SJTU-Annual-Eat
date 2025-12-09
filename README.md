@@ -24,7 +24,7 @@
 
 - Access Token 获取失败
 
-可以确认一下自己没有使用代理，sjtu服务器好像会somehow因为代理拒绝访问
+可以确认一下自己没有使用代理，SJTU 服务器好像会 somehow 因为代理拒绝访问
 
 - 运行到早中晚餐之后报错
 
@@ -76,14 +76,6 @@ df['time_in_seconds'] = df['payTime'].dt.hour * 3600 + df['payTime'].dt.minute *
 
 ![example](https://raw.githubusercontent.com/Milvoid/SJTU-Annual-Eat/main/figs/example.png)
 
-## Poster
-
-你也可以通过运行下面的脚本来生成一幅简单的海报，你可以用你的浏览器打开```海报.html```和截图。
-```
-python generate-poster.py
-```
-
-![](./figs/example-poster.png)
 
 ## Notes
 
