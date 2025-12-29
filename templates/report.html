@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SJTU {{ .Year }} 思源码年度报告</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-main: #2c3e50;
+            --text-sub: #86868b;
+            /* 渐变色定义 */
+            --gradient-blue: linear-gradient(135deg, #a8dadc 0%, #457b9d 100%);
+            --gradient-red: linear-gradient(135deg, #f1a7a1 0%, #e5989b 100%);
+            --gradient-purple: linear-gradient(135deg, #cdb4db 0%, #af97be 100%);
+            --frost-bg: rgba(255, 255, 255, 0.6);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body { height: 100%; width: 100%; overflow: hidden; }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        #snap-container {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        .ambient-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+            background: 
+                radial-gradient(at 10% 10%, rgba(168, 218, 220, 0.12) 0px, transparent 50%),
+                radial-gradient(at 90% 90%, rgba(205, 180, 219, 0.12) 0px, transparent 50%);
+        }
+
+        section {
+            height: 100vh;
+            width: 100%;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .content {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s cubic-bezier(0.25, 1, 0.5, 1);
+            max-width: 850px;
+            width: 100%;
+        }
+
+        section.active .content { opacity: 1; transform: translateY(0); }
+
+        /* 核心高亮数据样式 */
+        .hero-data {
+            font-size: clamp(3rem, 10vw, 5rem);
+            font-weight: 800;
+            margin: 0.5rem 0;
+            line-height: 1.1;
+            display: block;
+            background: var(--gradient-blue);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -2px;
+        }
+
+        .hero-red { background: var(--gradient-red); -webkit-background-clip: text; }
+        .hero-purple { background: var(--gradient-purple); -webkit-background-clip: text; }
+
+        .title-label {
+            font-size: 1.2rem;
+            color: var(--text-sub);
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+        }
+        
+        .title-label b {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .desc-text {
+            font-size: 1.1rem;
+            color: var(--text-sub);
+            font-weight: 400;
+            line-height: 1.8;
+            margin-top: 10px;
+        }
+        
+        .desc-text b {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .sub-quote {
+            font-size: 0.95rem;
+            color: var(--text-sub);
+            margin-top: 2rem;
+            font-weight: 300;
+        }
+
+        /* Dashboard 卡片布局优化 */
+        .dashboard-card {
+            background: var(--frost-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 28px;
+            padding: 24px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.02);
+            width: 100%;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 强制两列平分 */
+            gap: 20px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .chart-full-width {
+            grid-column: 1 / -1; /* 跨越所有列 */
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .chart-grid {
+                grid-template-columns: 1fr; /* 移动端单列堆叠 */
+            }
+        }
+
+        .chart-container { height: 200px; position: relative; width: 100%; }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 30px;
+            animation: bounce 2.5s infinite;
+            color: #d1d1d6;
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-8px);}
+            60% {transform: translateY(-4px);}
+        }
+    </style>
+</head>
+<body>
+
+<div class="ambient-bg"></div>
+
+<div id="snap-container">
+    <section>
+        <div class="content">
+            <p class="title-label" style="letter-spacing: 2px;">SJTU {{ .Year }}</p>
+            <h1 style="font-weight: 200; font-size: 2.8rem; letter-spacing: 10px; margin-top: 10px; color: var(--text-main);">思源码年度报告</h1>
+            <p class="sub-quote" style="margin-top: 40px; letter-spacing: 1px;">下滑开启</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="content">
+            <p class="title-label">{{ .Year }}年，你在交大共消费了</p>
+            <h2 class="hero-data">¥{{ printf "%.2f" .TotalAmount }}</h2>
+            <p class="desc-text">每一笔开支，都是在为向往的生活投票</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="content">
+            <p class="title-label"><b>{{ .FirstMealLocation }} </b>在</p>
+            <h2 class="hero-data hero-red" style="font-size: clamp(2rem, 8vw, 4rem);">{{ .FirstMealTime }}</h2>
+            <p class="desc-text">见证了你今年第一笔消费，一共花了 <b>{{ printf "%.2f" .FirstMealAmount }} 元</b>。<br>在交大的每一年都要有一个美好的开始。</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="content">
+            <p class="title-label"><b>{{ .MaxMealTime }}</b>，你在<b>{{ .MaxMealLocation }} </b>单笔最高消费了</p>
+            <h2 class="hero-data hero-purple">¥{{ printf "%.2f" .MaxMealAmount }}</h2>
+            <p class="desc-text">哇，真是胃口大开的一顿！</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="content">
+            <p class="title-label">最常光顾 <b>{{ .MostFrequentLocation }}</b></p>
+            <h2 class="hero-data">{{ .MostFrequentCount }} 次</h2>
+            <p class="desc-text">总共花了 <b>{{ printf "%.2f" .MostFrequentAmount }} 元</b>。这里的美食真是让你回味无穷。</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="content">
+            <p class="title-label">你在 <b>{{ .MostSpentLocation }}</b> 消费最多，总计</p>
+            <h2 class="hero-data hero-red">¥{{ printf "%.2f" .MostSpentAmount }}</h2>
+            <p class="desc-text">这是 <b>{{ .MostSpentCount }}</b> 次消费积累而成。<br>想来这里一定有你钟爱的菜品。</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="content">
+            <p class="title-label">这一年，你一共吃了</p>
+            <h2 class="hero-data hero-purple" style="font-size: clamp(1.8rem, 6vw, 3rem); letter-spacing: 0;">{{ .BreakfastCount }} / {{ .LunchCount }} / {{ .DinnerCount }}</h2>
+            <p class="desc-text">顿 <b>早餐 / 午餐 / 晚餐</b> <br>在交大的每一餐都要好好吃饭～</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="content">
+            <p class="title-label"><b>{{ .EarliestMealLocation }} </b>在</p>
+            <h2 class="hero-data" style="font-size: clamp(2rem, 8vw, 4rem);">{{ .EarliestMealTime }}</h2>
+            <p class="desc-text">记录下来今年最早的一次用餐，花了 <b>{{ printf "%.2f" .EarliestMealAmount }} 元</b>。<br>令人难忘的早起！</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="content">
+            <p class="title-label">你今年消费最密集的月份是</p>
+            <h2 class="hero-data hero-red">{{ .PeakMonth }} 月</h2>
+            <p class="desc-text">一共花了 <b>{{ printf "%.2f" .PeakMonthAmount }} 元</b>。<br>这个月你一定心情不错。</p>
+        </div>
+    </section>
+
+    <section style="height: auto; min-height: 100vh; padding-top: 80px;">
+        <div class="content" style="max-width: 1000px;">
+            <p class="title-label" style="letter-spacing: 2px; margin-bottom: 30px;">{{ .Year }} 消费看板</p>
+            
+            <div class="chart-grid">
+                <div class="dashboard-card">
+                    <h3 style="font-size: 0.9rem; margin-bottom: 15px; font-weight: 500;">食堂消费分布</h3>
+                    <div class="chart-container"><canvas id="merchantChart"></canvas></div>
+                </div>
+                <div class="dashboard-card">
+                    <h3 style="font-size: 0.9rem; margin-bottom: 15px; font-weight: 500;">月度支出趋势</h3>
+                    <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
+                </div>
+                
+                <div class="dashboard-card chart-full-width">
+                    <h3 style="font-size: 0.9rem; margin-bottom: 15px; font-weight: 500;">24小时消费时间分布</h3>
+                    <div class="chart-container" style="height: 180px;"><canvas id="timeChart"></canvas></div>
+                </div>
+            </div>
+
+            <div style="margin-top: 50px; padding-bottom: 40px;">
+                <p class="sub-quote">SJTU {{ .Year }} 思源码年度报告</p>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+    const REPORT_DATA = {{ .ReportJSON }};
+
+    // 观察器
+    const sections = document.querySelectorAll('section');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) entry.target.classList.add('active');
+        });
+    }, { threshold: 0.5 });
+    sections.forEach(s => observer.observe(s));
+
+    // 图表绘制（启用图例）
+    function initCharts() {
+        Chart.defaults.font.family = 'system-ui, sans-serif';
+        Chart.defaults.color = '#86868b';
+        const months = Object.keys(REPORT_DATA.MonthlyAmount).sort((a,b)=>a-b);
+
+        // 公共图例配置
+        const legendConfig = {
+            display: true,
+            position: 'bottom',
+            reverse: true,
+            labels: {
+                boxWidth: 10,
+                padding: 15,
+                usePointStyle: true,
+                font: { size: 10 }
+            }
+        };
+
+        // 1. 食堂占比（前 5 + 其他，按金额降序）
+        const merchantEntries = Object.entries(REPORT_DATA.MerchantAmount || {}).sort((a, b) => b[1] - a[1]);
+        const topMerchants = merchantEntries.slice(0, 5);
+        const otherSum = merchantEntries.slice(5).reduce((acc, [, v]) => acc + v, 0);
+        if (otherSum > 0) {
+            topMerchants.push(['其他', otherSum]);
+        }
+        const merchantLabels = topMerchants.map(([k]) => k);
+        const merchantValues = topMerchants.map(([, v]) => v);
+
+        new Chart(document.getElementById('merchantChart'), {
+            type: 'doughnut',
+            data: {
+                labels: merchantLabels,
+                datasets: [{
+                    data: merchantValues,
+                    backgroundColor: ['#a8dadc', '#cdb4db', '#ffc8dd', '#bde0fe', '#f1a7a1', '#d3d3d3'],
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { legend: legendConfig }, // 启用图例
+                cutout: '60%' 
+            }
+        });
+
+        // 2. 月度趋势
+        new Chart(document.getElementById('monthlyChart'), {
+            type: 'bar',
+            data: {
+                labels: months.map(m => m + '月'),
+                datasets: [{
+                    label: '消费金额',
+                    data: months.map(m => REPORT_DATA.MonthlyAmount[m]),
+                    backgroundColor: 'rgba(168, 218, 220, 0.6)',
+                    borderRadius: 4,
+                    barPercentage: 0.6
+                }]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                scales: { y: { display: false }, x: { grid: { display: false } } }, 
+                plugins: { legend: legendConfig } // 启用图例
+            }
+        });
+
+        // 3. 时间分布
+        if (REPORT_DATA.TimeDistribution) {
+            new Chart(document.getElementById('timeChart'), {
+                type: 'line',
+                data: {
+                    labels: Object.keys(REPORT_DATA.TimeDistribution).map(h => h + ':00'),
+                    datasets: [{
+                        label: '消费频次',
+                        data: Object.values(REPORT_DATA.TimeDistribution),
+                        borderColor: '#cdb4db',
+                        backgroundColor: 'rgba(205, 180, 219, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 2
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    scales: { y: { display: false }, x: { grid: { display: false } } }, 
+                    plugins: { legend: legendConfig } // 启用图例
+                }
+            });
+        }
+    }
+    window.onload = initCharts;
+</script>
+</body>
+</html>
